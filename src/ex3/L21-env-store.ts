@@ -5,7 +5,7 @@ import { Result, makeFailure, makeOk, bind, either, isOk } from "../shared/resul
 // ========================================================
 // Box datatype
 // Encapsulate mutation in a single type.
-type Box<T> = T[];
+type Box<T> = T[];  // ---> Box<Box<Values>[]> = Box<Values>[][]
 const makeBox = <T>(x: T): Box<T> => ([x]);
 const unbox = <T>(b: Box<T>): T => b[0];
 const setBox = <T>(b: Box<T>, v: T): void => { b[0] = v; return; }
@@ -14,25 +14,31 @@ const setBox = <T>(b: Box<T>, v: T): void => { b[0] = v; return; }
 // Store datatype
 export interface Store {
     tag: "Store";
-    vals: Box<Value>[];
+    vals: Box<Box<Value>[]>; 
 }
-export interface EmptyStore {tag: "Empty"};
+
+export const isStore = (x: any): x is Store => x.tag === "Store";;  // box(array of (boxes of values))
+export const makeEmptyStore = () : Store  => ({tag: "Store", vals: makeBox([]) })   // box(array) 
+
+export const theStore: Store = makeEmptyStore(); //The main Store like "database" of values.
+
+export const extendStore = (s: Store, val: Value): Store =>  { //Adding a new value to the store by using (define ). we use this method with evalDefine.
+    setBox(s.vals,unbox(s.vals).concat(makeBox(val)));
+    return s;
+}
 
 
-export const isStore = (x: any): x is Store => x.tag === "Store";;
-export const makeEmptyStore = <T>() : Store  => ({tag: "Store", vals: Box<Value>[]});
-export const theStore: Store = makeEmptyStore();
-export const extendStore = (s: Store, val: Value): Store =>
+export const getLastAddress = (s: Store) : number => unbox(s.vals).length-1; // after we add a new value we want to get his position "Address"
     
+export const applyStore = (store: Store, address: number): Result<Value> => // returns the real value of the argument by using his address
+    makeOk(unbox(unbox(store.vals))[address]);
     
-export const applyStore = (store: Store, address: number): Result<Value> =>
-    // Complete
   
-export const setStore = (store: Store, address: number, val: Value): void => {
-    //if address > store.vals.length 
-    setBox(store.vals[address],val);
-    return;
-    }
+export const setStore = (store: Store, address: number, val: Value): void => 
+    setBox(unbox(store.vals)[address],val)
+//for using the (set! ) method.
+    
+    
 
 // ========================================================
 // Environment data type

@@ -23,7 +23,7 @@ export const makeEmptyStore = () : Store  => ({tag: "Store", vals: makeBox([]) }
 export const theStore: Store = makeEmptyStore(); //The main Store like "database" of values.
 
 export const extendStore = (s: Store, val: Value): Store =>  { //Adding a new value to the store by using (define ) or applyClosure. 
-    setBox(s.vals,unbox(s.vals).concat(makeBox(val)));
+    setBox(s.vals,unbox(s.vals).concat([makeBox(val)]));
     return s;
 }
 
@@ -31,7 +31,7 @@ export const extendStore = (s: Store, val: Value): Store =>  { //Adding a new va
 export const getLastAddress = (s: Store) : number => unbox(s.vals).length-1; // after we add a new value we want to get his position "Address"
     
 export const applyStore = (store: Store, address: number): Result<Value> => // returns the real value of the argument by using his address
-    makeOk(unbox(unbox(store.vals))[address]);
+    makeOk(unbox(unbox(store.vals)[address]));
     
   
 export const setStore = (store: Store, address: number, val: Value): void => 
@@ -47,8 +47,8 @@ export type Env = GlobalEnv | ExtEnv;
 
 interface GlobalEnv {
     tag: "GlobalEnv";
-    vars: Box<Box<string[]>>;
-    addresses: Box<Box<number[]>>;
+    vars: Box<string[]>;
+    addresses: Box<number[]>;
 }
 
 
@@ -79,8 +79,13 @@ export const applyEnv = (env: Env, v: string): Result<number> =>
     isGlobalEnv(env) ? applyGlobalEnv(env, v) :
     applyExtEnv(env, v);
 
+
+
+
 const applyGlobalEnv = (env: GlobalEnv, v: string): Result<number> => 
-        unbox(unbox(env.vars)).includes(v) ? makeOk(unbox(unbox(env.addresses))[unbox(unbox(env.vars)).indexOf(v)]) : makeFailure("where is my varDec man? come On");
+        unbox(env.vars).includes(v) ? makeOk(unbox(env.addresses)[unbox(env.vars).indexOf(v)]) : makeFailure("where is my varDec man? come On");
+
+
     
 /*
 interface GlobalEnv {
@@ -97,8 +102,8 @@ b[0] = b[0].concat([var])
 
 export const globalEnvAddBinding = (v: string, addr: number): void =>
     {
-        setBox(theGlobalEnv.vars,unbox(theGlobalEnv.vars).concat(makeBox(v)));
-        setBox(theGlobalEnv.addresses,unbox(theGlobalEnv.addresses).concat(makeBox(addr)));
+        setBox(theGlobalEnv.vars,unbox(theGlobalEnv.vars).concat([v]));
+        setBox(theGlobalEnv.addresses,unbox(theGlobalEnv.addresses).concat([addr]));
     }
 
 const applyExtEnv = (env: ExtEnv, v: string): Result<number> =>

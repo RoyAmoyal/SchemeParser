@@ -22,7 +22,7 @@ export const makeEmptyStore = () : Store  => ({tag: "Store", vals: makeBox([]) }
 
 export const theStore: Store = makeEmptyStore(); //The main Store like "database" of values.
 
-export const extendStore = (s: Store, val: Value): Store =>  { //Adding a new value to the store by using (define ). we use this method with evalDefine.
+export const extendStore = (s: Store, val: Value): Store =>  { //Adding a new value to the store by using (define ) or applyClosure. 
     setBox(s.vals,unbox(s.vals).concat(makeBox(val)));
     return s;
 }
@@ -47,8 +47,8 @@ export type Env = GlobalEnv | ExtEnv;
 
 interface GlobalEnv {
     tag: "GlobalEnv";
-    vars: Box<string[]>;
-    addresses: Box<number[]>
+    vars: Box<Box<string[]>>;
+    addresses: Box<Box<number[]>>;
 }
 
 
@@ -80,21 +80,33 @@ export const applyEnv = (env: Env, v: string): Result<number> =>
     applyExtEnv(env, v);
 
 const applyGlobalEnv = (env: GlobalEnv, v: string): Result<number> => 
-        unbox(env.vars).includes(v) ? makeOk(unbox(env.addresses)[unbox(env.vars).indexOf(v)]) : makeFailure("var doesnt exist")
-
+        unbox(unbox(env.vars)).includes(v) ? makeOk(unbox(unbox(env.addresses))[unbox(unbox(env.vars)).indexOf(v)]) : makeFailure("where is my varDec man? come On");
     
+/*
+interface GlobalEnv {
+    tag: "GlobalEnv";
+    vars: Box<Box<string[]>>;
+    addresses: Box<Box<number[]>>;
+}
+const makeBox = <T>(x: T): Box<T> => ([x]);
+const unbox = <T>(b: Box<T>): T => b[0];
+const setBox = <T>(b: Box<T>, v: T): void => { b[0] = v; return; }
+b[0] = b[0].concat([var])
+*/
+
+
 export const globalEnvAddBinding = (v: string, addr: number): void =>
     {
-        
-
+        setBox(theGlobalEnv.vars,unbox(theGlobalEnv.vars).concat(makeBox(v)));
+        setBox(theGlobalEnv.addresses,unbox(theGlobalEnv.addresses).concat(makeBox(addr)));
     }
 
 const applyExtEnv = (env: ExtEnv, v: string): Result<number> =>
     env.vars.includes(v) ? makeOk(env.addresses[env.vars.indexOf(v)]) :
     applyEnv(env.nextEnv, v);
 
-const applyEnvStore = (env: ExtEnv, v: string) : Result<Value> =>
+export const applyEnvStore = (env: Env, v: string) : Result<Value> =>
 {
     const address = applyEnv(env,v);
-    return isOk(address) ? applyStore(theStore,address.value) : makeFailure("noobs")
+    return isOk(address) ? applyStore(theStore,address.value) : makeFailure("why I am not ok man?")
 }

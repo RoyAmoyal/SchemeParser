@@ -333,4 +333,5 @@ export const unparse = (exp: Parsed): string =>
     isLetExp(exp) ? unparseLetExp(exp) :
     isDefineExp(exp) ? `(define ${exp.var.var} ${unparse(exp.val)})` :
     isProgram(exp) ? `(L21 ${unparseLExps(exp.exps)})` :
+    isSetExp(exp) ? `(set! ${unparse(exp.var)} ${(unparse(exp.val))})`:
     exp;

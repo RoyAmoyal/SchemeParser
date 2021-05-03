@@ -34,8 +34,13 @@ export const applyStore = (store: Store, address: number): Result<Value> => // r
     makeOk(unbox(unbox(store.vals)[address]));
     
   
-export const setStore = (store: Store, address: number, val: Value): void => 
-    setBox(unbox(store.vals)[address],val)
+export const setStore = (store: Store, address: number, val: Value): void => {
+    setBox(unbox(store.vals[address]),val)
+}
+    // 
+
+
+    
 //for using the (set! ) method.
     
     
@@ -83,7 +88,10 @@ export const applyEnv = (env: Env, v: string): Result<number> =>
 
 
 const applyGlobalEnv = (env: GlobalEnv, v: string): Result<number> => 
-        unbox(env.vars).includes(v) ? makeOk(unbox(env.addresses)[unbox(env.vars).indexOf(v)]) : makeFailure("where is my varDec man? come On");
+        unbox(env.vars).includes(v) ? makeOk(unbox(env.addresses)[unbox(env.vars).indexOf(v)]) : 
+        makeFailure("where is my varDec man? come On " + v);
+
+
 
 
     

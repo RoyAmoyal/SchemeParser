@@ -10,7 +10,7 @@ import { applyEnv, makeExtEnv, Env, Store, setStore, extendStore, ExtEnv, applyE
 import { isClosure, makeClosure, Closure, Value } from "./L21-value-store";
 import { applyPrimitive } from "./evalPrimitive-store";
 import { first, rest, isEmpty } from "../shared/list";
-import { Result, bind, safe2, mapResult, makeFailure, makeOk } from "../shared/result";
+import { Result, bind, safe2, mapResult, makeFailure, makeOk, isOk } from "../shared/result";
 import { parse as p } from "../shared/parser";
 import { ok } from "node:assert";
 
@@ -63,6 +63,7 @@ const applyProcedure = (proc: Value, args: Value[]): Result<Value> =>
 
 const applyClosure = (proc: Closure, args: Value[]): Result<Value> => {
     const vars = map((v: VarDecl) => v.var, proc.params);
+
     const addresses: number[] = map((arg : Value) => 
     {
         extendStore(theStore,arg)
@@ -74,12 +75,13 @@ const applyClosure = (proc: Closure, args: Value[]): Result<Value> => {
 }
 
 
-
-
-const evalSet = (exp: SetExp, env: Env): Result<void> =>
-    safe2((val: Value, address: number) => makeOk(setStore(theStore, address, val)))
+const evalSet = (exp: SetExp, env: Env): Result<void> =>{
+    const lala0 = applicativeEval(exp.val, env);
+    const lala = () => isOk(lala0) ? lala0.value : "not ok for some reason";
+    console.log("The set right now is (set! " +exp.var.var + " "+ lala())
+    return safe2((val: Value, address: number) => makeOk(setStore(theStore, address, val)))
         (applicativeEval(exp.val, env), applyEnv(env, exp.var.var));
-
+}
 
 // Evaluate a sequence of expressions (in a program)
 export const evalSequence = (seq: Exp[], env: Env): Result<Value> =>

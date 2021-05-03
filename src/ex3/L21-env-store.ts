@@ -28,14 +28,14 @@ export const extendStore = (s: Store, val: Value): Store =>  { //Adding a new va
 }
 
 
-export const getLastAddress = (s: Store) : number => unbox(s.vals).length-1; // after we add a new value we want to get his position "Address"
+export const getLastAddress = (s: Store) : number => (unbox(s.vals).length-1); // after we add a new value we want to get his position "Address"
     
 export const applyStore = (store: Store, address: number): Result<Value> => // returns the real value of the argument by using his address
     makeOk(unbox(unbox(store.vals)[address]));
     
   
 export const setStore = (store: Store, address: number, val: Value): void => {
-    setBox(unbox(store.vals[address]),val)
+    setBox(unbox(store.vals)[address],val)
 }
     // 
 

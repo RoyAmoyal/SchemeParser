@@ -6,7 +6,7 @@
 
 import { append, map } from 'ramda';
 import { isArray, isNumber, isString } from '../shared/type-predicates';
-import { CExp, isPrimOp, PrimOp, VarDecl, unparse } from './L21-ast';
+import { CExp, isPrimOp, PrimOp, VarDecl, unparse, SetExp } from './L21-ast';
 import { Env } from './L21-env-store';
 
 // Add void for value of side-effect expressions - set! and define
@@ -44,7 +44,7 @@ export interface SymbolSExp {
 }
 
 // @@L2-BOX-VALUE
-// Add void for value of side-effect expressions - set! and define
+// Add void for value of side-effect expressions - set! and define 
 export type SExpValue = void | number | boolean | string | PrimOp | Closure | SymbolSExp | EmptySExp | CompoundSExp;
 export const isSExp = (x: any): x is SExpValue =>
     typeof(x) === 'string' || typeof(x) === 'boolean' || typeof(x) === 'number' ||
